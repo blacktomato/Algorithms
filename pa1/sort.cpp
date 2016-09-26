@@ -2,7 +2,7 @@
  * File Name : sort.cpp
  * Purpose : Sort the word data
  * Creation Date : Fri 23 Sep 2016 11:50:07 AM CST
- * Last Modified : Fri 23 Sep 2016 06:03:41 PM CST
+ * Last Modified : Tue 27 Sep 2016 12:08:12 AM CST
  * Created By : SL Chung
 **************************************************************/
 #include<cstdio>
@@ -18,6 +18,8 @@ typedef pair<string,int> data;
 
 void print_data(const vector<data>&);
 void swap(data&, data&);
+void mergesort(vector<data>&);
+
 
 int main(int argc, char** argv)
 {
@@ -52,7 +54,10 @@ int main(int argc, char** argv)
             }
         }
     }
-    else if (option == "-merge");
+    else if (option == "-merge")
+    {
+        mergesort(d);
+    }
     else if (option == "-heap");
     else if (option == "-quick");
     
@@ -75,3 +80,50 @@ void swap(data &a, data &b)
     a = b;
     b = temp;
 }
+
+void mergesort(vector<data> &datas)
+{
+    size_t s =  datas.size();
+    size_t count = 0;
+    if (s == 1 || s == 0);
+    else if (s >= 2)
+    {
+        vector<data> temp1(datas.begin(), datas.end() - s / 2);
+        size_t n = s / 2;
+        if (s % 2 == 0); else n++;
+        vector<data> temp2(datas.begin() + n, datas.end());
+        mergesort(temp1);
+        mergesort(temp2);
+        vector<data> temp;
+        while(temp1.size() * temp2.size() != 0)
+        {
+            if (temp1[0] <= temp2[0])
+            {
+                temp.push_back(temp1[0]);
+                temp1.erase(temp1.begin());
+            }
+            else
+            {
+                temp.push_back(temp2[0]);
+                temp2.erase(temp2.begin());
+            }
+            count++;
+        }
+        while(count != s)
+        {
+            if (temp1.size() != 0)
+            {
+                temp.push_back(temp1[0]);
+                temp1.erase(temp1.begin());
+            }
+            else if (temp2.size() != 0)
+            {
+                temp.push_back(temp2[0]);
+                temp2.erase(temp2.begin());
+            }
+            count++;
+        }
+
+        datas = temp;
+    }   
+}       
