@@ -2,7 +2,7 @@
  * File Name : sort.cpp
  * Purpose : Sort the word data
  * Creation Date : Fri 23 Sep 2016 11:50:07 AM CST
- * Last Modified : Tue 27 Sep 2016 09:21:22 PM CST
+ * Last Modified : Wed 28 Sep 2016 00:20:25 CST
  * Created By : SL Chung
 **************************************************************/
 #include<cstdio>
@@ -19,7 +19,7 @@ typedef pair<string,int> data;
 void print_data(const vector<data>&);
 void swap(data&, data&);
 void mergesort(vector<data>&);
-void quicksort(vector<data>&);
+void quicksort(vector<data>&, int, int);
 
 
 int main(int argc, char** argv)
@@ -65,8 +65,8 @@ int main(int argc, char** argv)
     }
     else if (option == "-quick")
     {
-        
-    }   
+       quicksort(d, 0, Total - 1); 
+    }
     //show the output
     print_data(d);
     return 0;
@@ -134,48 +134,48 @@ void mergesort(vector<data> &datas)
     }   
 }       
 
-void quicksort(vector<data> &datas)
+void quicksort(vector<data> &datas, int start, int end)
 {
-    size_t s =  datas.size();
+    int s =  end - start + 1;
     if (s == 1 || s == 0);
     else if (s >= 2)
     {
+        int iter = start;
+        int comp = end;
         bool done = false;
-        vector<data>::iterator it = datas.begin();
-        vector<data>::iterator comp = datas.end() - 1;
         while(!done)
         {
-            if(it < comp)
+            if(iter < comp)
             {   
-                if ( (*it).first <= (*comp).first)
+                if ( datas[iter].first <= datas[comp].first)
                     comp--;
                 else
                 {
-                    swap(*it, *comp);
-                    vector<data>::iterator temp;
-                    temp = it;
-                    it = comp;
+                    swap(datas[iter], datas[comp]);
+                    int temp;
+                    temp = iter;
+                    iter = comp;
                     comp = temp;
                     comp++;
                 }
             }
-            else if (it > comp)
+            else if (iter > comp)
             {
-                if ( (*it).first >= (*comp).first)
+                if ( datas[iter].first >= datas[comp].first)
                     comp++;
                 else
                 {
-                    swap(*it, *comp);
-                    vector<data>::iterator temp;
-                    temp = it;
-                    it = comp;
+                    swap(datas[iter], datas[comp]);
+                    int temp;
+                    temp = iter;
+                    iter = comp;
                     comp = temp;
                     comp--;
                 }
             }
             else break;
         }
-        vector<data> &sub1(datas.begin(), it);
-        vector<data> &sub2(++it, datas.end());
+        quicksort(datas, start, iter - 1);
+        quicksort(datas, iter + 1, end);
     }   
 }       
