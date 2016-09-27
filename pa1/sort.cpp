@@ -2,7 +2,7 @@
  * File Name : sort.cpp
  * Purpose : Sort the word data
  * Creation Date : Fri 23 Sep 2016 11:50:07 AM CST
- * Last Modified : Tue 27 Sep 2016 12:08:12 AM CST
+ * Last Modified : Tue 27 Sep 2016 09:21:22 PM CST
  * Created By : SL Chung
 **************************************************************/
 #include<cstdio>
@@ -19,6 +19,7 @@ typedef pair<string,int> data;
 void print_data(const vector<data>&);
 void swap(data&, data&);
 void mergesort(vector<data>&);
+void quicksort(vector<data>&);
 
 
 int main(int argc, char** argv)
@@ -32,13 +33,13 @@ int main(int argc, char** argv)
     int Total = p.QueryTotalStringCount();
     cout << Total << "\n";
 
-    //the data set
+    //create the data set
     vector<data> d;
     for(int i = 0; i < Total; i++)
     {
         pair< string, int > word(p.QueryString(i), i);
         d.push_back(word);
-    }
+    }  
     
     //for different sorting method
     string option = argv[2];
@@ -51,16 +52,21 @@ int main(int argc, char** argv)
             {
                 swap(d[j], d[j-1]);
                 if (j > 1) j--;
-            }
-        }
-    }
+             }
+         }
+    } 
     else if (option == "-merge")
     {
         mergesort(d);
     }
-    else if (option == "-heap");
-    else if (option == "-quick");
-    
+    else if (option == "-heap")
+    {
+        ;
+    }
+    else if (option == "-quick")
+    {
+        
+    }   
     //show the output
     print_data(d);
     return 0;
@@ -125,5 +131,51 @@ void mergesort(vector<data> &datas)
         }
 
         datas = temp;
+    }   
+}       
+
+void quicksort(vector<data> &datas)
+{
+    size_t s =  datas.size();
+    if (s == 1 || s == 0);
+    else if (s >= 2)
+    {
+        bool done = false;
+        vector<data>::iterator it = datas.begin();
+        vector<data>::iterator comp = datas.end() - 1;
+        while(!done)
+        {
+            if(it < comp)
+            {   
+                if ( (*it).first <= (*comp).first)
+                    comp--;
+                else
+                {
+                    swap(*it, *comp);
+                    vector<data>::iterator temp;
+                    temp = it;
+                    it = comp;
+                    comp = temp;
+                    comp++;
+                }
+            }
+            else if (it > comp)
+            {
+                if ( (*it).first >= (*comp).first)
+                    comp++;
+                else
+                {
+                    swap(*it, *comp);
+                    vector<data>::iterator temp;
+                    temp = it;
+                    it = comp;
+                    comp = temp;
+                    comp--;
+                }
+            }
+            else break;
+        }
+        vector<data> &sub1(datas.begin(), it);
+        vector<data> &sub2(++it, datas.end());
     }   
 }       
