@@ -2,7 +2,7 @@
  * File Name : sort.cpp
  * Purpose : Sort the word data
  * Creation Date : Fri 23 Sep 2016 11:50:07 AM CST
- * Last Modified : Wed 28 Sep 2016 00:20:25 CST
+ * Last Modified : Wed 28 Sep 2016 10:54:44 PM CST
  * Created By : SL Chung
 **************************************************************/
 #include<cstdio>
@@ -20,7 +20,8 @@ void print_data(const vector<data>&);
 void swap(data&, data&);
 void mergesort(vector<data>&);
 void quicksort(vector<data>&, int, int);
-
+void heapify(vector<data>&, size_t, size_t);
+void heapsort(vector<data>&);
 
 int main(int argc, char** argv)
 {
@@ -61,7 +62,7 @@ int main(int argc, char** argv)
     }
     else if (option == "-heap")
     {
-        ;
+        heapsort(d);
     }
     else if (option == "-quick")
     {
@@ -133,6 +134,37 @@ void mergesort(vector<data> &datas)
         datas = temp;
     }   
 }       
+
+void heapify(vector<data> &datas, size_t root, size_t length)
+{
+    size_t leftNode = root * 2 + 1;
+    size_t rightNode = root * 2 + 2;
+    //default setting the maxNode is root
+    size_t maxNode = root;
+    if (leftNode < length && datas[leftNode].first > datas[maxNode].first)
+        maxNode = leftNode;
+    if (rightNode < length && datas[rightNode].first > datas[maxNode].first)
+        maxNode = rightNode;
+    if (maxNode != root)
+    {
+        swap(datas[maxNode], datas[root]);
+        heapify(datas, maxNode, length);
+    }
+}
+
+void heapsort(vector<data> &datas)
+{
+    size_t length = datas.size();
+    for (int i = length / 2 - 1; i >= 0; i--)
+    {
+        heapify(datas, i, length);
+    }
+    for (size_t i = length - 1; i > 0; i--)
+    {
+        swap(datas[i], datas[0]);
+        heapify(datas, 0, i);
+    }
+}
 
 void quicksort(vector<data> &datas, int start, int end)
 {
