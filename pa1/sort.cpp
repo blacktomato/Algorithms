@@ -2,7 +2,7 @@
  * File Name : sort.cpp
  * Purpose : Sort the word data
  * Creation Date : Fri 23 Sep 2016 11:50:07 AM CST
- * Last Modified : Wed 28 Sep 2016 10:54:44 PM CST
+ * Last Modified : Wed 28 Sep 2016 11:55:18 PM CST
  * Created By : SL Chung
 **************************************************************/
 #include<cstdio>
@@ -18,8 +18,8 @@ typedef pair<string,int> data;
 
 void print_data(const vector<data>&);
 void swap(data&, data&);
-void mergesort(vector<data>&);
-void quicksort(vector<data>&, int, int);
+void mergesort(vector<data>&, size_t, size_t);
+void quicksort(vector<data>&, size_t, size_t);
 void heapify(vector<data>&, size_t, size_t);
 void heapsort(vector<data>&);
 
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     } 
     else if (option == "-merge")
     {
-        mergesort(d);
+        mergesort(d, 0, Total);
     }
     else if (option == "-heap")
     {
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 }
 
 void print_data(const vector<data> &Data)
-{
+{ 
     for(size_t i = 0; i < Data.size(); i++)
     {
         cout << Data[i].first << " " << Data[i].second << "\n";
@@ -86,54 +86,56 @@ void swap(data &a, data &b)
     data temp = a;
     a = b;
     b = temp;
-}
+} 
 
-void mergesort(vector<data> &datas)
+void mergesort(vector<data> &datas, size_t start, size_t end)
 {
-    size_t s =  datas.size();
+    size_t s =  end - start;    //start from 0
     size_t count = 0;
     if (s == 1 || s == 0);
     else if (s >= 2)
     {
-        vector<data> temp1(datas.begin(), datas.end() - s / 2);
-        size_t n = s / 2;
-        if (s % 2 == 0); else n++;
-        vector<data> temp2(datas.begin() + n, datas.end());
-        mergesort(temp1);
-        mergesort(temp2);
+        size_t start_1 = start;
+        size_t end_1 = end - s / 2;
+        size_t start_2 = end_1;
+        size_t end_2 = end;
+        mergesort(datas, start_1, end_1);
+        mergesort(datas, start_2, end_2);
         vector<data> temp;
-        while(temp1.size() * temp2.size() != 0)
+        while((end_1 - start_1) * (end_2 - start_2) != 0)
         {
-            if (temp1[0] <= temp2[0])
+            if (datas[start_1] <= datas[start_2])
             {
-                temp.push_back(temp1[0]);
-                temp1.erase(temp1.begin());
+                temp.push_back(datas[start_1]);
+                start_1++;
             }
             else
             {
-                temp.push_back(temp2[0]);
-                temp2.erase(temp2.begin());
+                temp.push_back(datas[start_2]);
+                start_2++;
             }
             count++;
         }
         while(count != s)
         {
-            if (temp1.size() != 0)
+            if (end_1 - start_1 != 0)
             {
-                temp.push_back(temp1[0]);
-                temp1.erase(temp1.begin());
+                temp.push_back(datas[start_1]);
+                start_1++;
             }
-            else if (temp2.size() != 0)
+            else if (end_2 - start_2 != 0)
             {
-                temp.push_back(temp2[0]);
-                temp2.erase(temp2.begin());
+                temp.push_back(datas[start_2]);
+                start_2++;
             }
             count++;
         }
-
-        datas = temp;
+        for(size_t i = start; i < end; i++)
+        {
+            datas[i] = temp[i - start];
+        }
     }   
-}       
+}        
 
 void heapify(vector<data> &datas, size_t root, size_t length)
 {
@@ -166,14 +168,14 @@ void heapsort(vector<data> &datas)
     }
 }
 
-void quicksort(vector<data> &datas, int start, int end)
+void quicksort(vector<data> &datas, size_t start, size_t end)
 {
-    int s =  end - start + 1;
+    size_t s =  end - start + 1;
     if (s == 1 || s == 0);
     else if (s >= 2)
     {
-        int iter = start;
-        int comp = end;
+        size_t iter = start;
+        size_t comp = end;
         bool done = false;
         while(!done)
         {
