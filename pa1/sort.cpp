@@ -2,7 +2,7 @@
  * File Name : sort.cpp
  * Purpose : Sort the word data
  * Creation Date : Fri 23 Sep 2016 11:50:07 AM CST
- * Last Modified : Thu 29 Sep 2016 08:17:20 PM CST
+ * Last Modified : Fri 30 Sep 2016 01:24:17 CST
  * Created By : SL Chung
 **************************************************************/
 #include<cstdio>
@@ -29,7 +29,13 @@ int main(int argc, char** argv)
 
     AlgParser p;
     AlgTimer t;
-    
+    if (argc < 4)
+    {
+        cerr << "Error: The command format should be "
+             << "\"./sort <input-file> <sort-option> <output-file>\"" << endl;
+        return 1;
+    }
+
     p.Parse(argv[1]);
     //total word count
     int Total = p.QueryTotalStringCount();
@@ -46,15 +52,18 @@ int main(int argc, char** argv)
     string option = argv[2];
     if (option == "-insert")
     {
-        for(int i = 1; i < Total; i++)
+        for(int i = 0; i < Total - 1; i++)
         {
             //cout << i << endl;
             int j = i;
-            while(d[j] < d[j-1])
+            data temp = d[j + 1];
+            while(temp.first < d[j].first)
             {
-                swap(d[j], d[j-1]);
-                if (j > 1) j--;
-             }
+                d[j + 1] = d[j];
+                if (j > 0) j--;
+                else if(j == 0) break;
+            }
+            d[j] = temp;
          }
     } 
     else if (option == "-merge")
@@ -68,6 +77,11 @@ int main(int argc, char** argv)
     else if (option == "-quick")
     {
        quicksort(d, 0, Total - 1); 
+    }
+    else
+    {
+        cerr << "Error: Need to choose a sorting algorithm: -insert|-merge|-heap|-quick" << endl;
+        return 1;
     }
     //show the output
     //print_data(d);
@@ -222,7 +236,7 @@ void quicksort(vector<data> &datas, size_t start, size_t end)
 void output(vector<data>& datas, string& file_name)
 {
     fstream file;
-    file.open(file_name, fstream::out);
+    file.open(file_name.c_str(), fstream::out);
     file << datas.size() << "\n";
     if (file.is_open())
     {
