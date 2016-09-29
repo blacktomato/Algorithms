@@ -2,7 +2,7 @@
  * File Name : sort.cpp
  * Purpose : Sort the word data
  * Creation Date : Fri 23 Sep 2016 11:50:07 AM CST
- * Last Modified : Wed 28 Sep 2016 11:55:18 PM CST
+ * Last Modified : Thu 29 Sep 2016 12:18:35 PM CST
  * Created By : SL Chung
 **************************************************************/
 #include<cstdio>
@@ -22,6 +22,7 @@ void mergesort(vector<data>&, size_t, size_t);
 void quicksort(vector<data>&, size_t, size_t);
 void heapify(vector<data>&, size_t, size_t);
 void heapsort(vector<data>&);
+void output(vector<data>&, string&);
 
 int main(int argc, char** argv)
 {
@@ -32,7 +33,6 @@ int main(int argc, char** argv)
     p.Parse(argv[1]);
     //total word count
     int Total = p.QueryTotalStringCount();
-    cout << Total << "\n";
 
     //create the data set
     vector<data> d;
@@ -69,7 +69,11 @@ int main(int argc, char** argv)
        quicksort(d, 0, Total - 1); 
     }
     //show the output
-    print_data(d);
+    //print_data(d);
+
+    //write into the file
+    string filename = argv[3];
+    output(d, filename);
     return 0;
 }
 
@@ -213,3 +217,19 @@ void quicksort(vector<data> &datas, size_t start, size_t end)
         quicksort(datas, iter + 1, end);
     }   
 }       
+
+void output(vector<data>& datas, string& file_name)
+{
+    fstream file;
+    file.open(file_name, fstream::out);
+    file << datas.size() << "\n";
+    if (file.is_open())
+    {
+        for (size_t i = 0; i < datas.size(); i++)
+        {
+            file << datas[i].first << " " << datas[i].second << "\n";
+        }
+    }
+    else cerr << "Fail to open the file \"" << file_name << "\"\n";
+    file.close();
+}
