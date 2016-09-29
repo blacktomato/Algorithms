@@ -2,7 +2,7 @@
  * File Name : sort.cpp
  * Purpose : Sort the word data
  * Creation Date : Fri 23 Sep 2016 11:50:07 AM CST
- * Last Modified : Thu 29 Sep 2016 12:18:35 PM CST
+ * Last Modified : Thu 29 Sep 2016 08:17:20 PM CST
  * Created By : SL Chung
 **************************************************************/
 #include<cstdio>
@@ -48,6 +48,7 @@ int main(int argc, char** argv)
     {
         for(int i = 1; i < Total; i++)
         {
+            //cout << i << endl;
             int j = i;
             while(d[j] < d[j-1])
             {
