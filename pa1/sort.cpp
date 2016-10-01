@@ -2,7 +2,7 @@
  * File Name : sort.cpp
  * Purpose : Sort the word data
  * Creation Date : Fri 23 Sep 2016 11:50:07 AM CST
- * Last Modified : Fri 30 Sep 2016 01:24:17 CST
+ * Last Modified : Sat 01 Oct 2016 23:37:32 CST
  * Created By : SL Chung
 **************************************************************/
 #include<cstdio>
@@ -39,6 +39,9 @@ int main(int argc, char** argv)
     p.Parse(argv[1]);
     //total word count
     int Total = p.QueryTotalStringCount();
+    
+    //start the timer
+    t.Begin();
 
     //create the data set
     vector<data> d;
@@ -89,6 +92,10 @@ int main(int argc, char** argv)
     //write into the file
     string filename = argv[3];
     output(d, filename);
+    
+    cout << "The execution spends " << t.End() << " seconds" << endl;
+    cout << "Press Enter to terminate the program..." << endl;
+    getchar();
     return 0;
 }
 
