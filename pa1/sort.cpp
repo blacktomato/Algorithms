@@ -2,7 +2,7 @@
  * File Name : sort.cpp
  * Purpose : Sort the word data
  * Creation Date : Fri 23 Sep 2016 11:50:07 AM CST
- * Last Modified : Sun 02 Oct 2016 00:47:59 CST
+ * Last Modified : Thu 13 Oct 2016 10:03:30 PM CST
  * Created By : SL Chung
 **************************************************************/
 #include<cstdio>
@@ -55,18 +55,22 @@ int main(int argc, char** argv)
     string option = argv[2];
     if (option == "-insert")
     {
-        for(int i = 0; i < Total - 1; i++)
+        for(int i = 1; i < Total; i++)
         {
             //cout << i << endl;
             int j = i;
-            data temp = d[j + 1];
-            while(temp.first < d[j].first)
+            data temp = d[j];
+            while(temp.first < d[j-1].first)
             {
-                d[j + 1] = d[j];
-                if (j > 0) j--;
-                else if(j == 0) break;
+                d[j] = d[j-1];
+                d[j-1] = temp;
+                if (j > 1) 
+                {
+                    j--;
+                    temp = d[j];
+                }
+                else if(j == 1) break;
             }
-            d[j] = temp;
          }
     } 
     else if (option == "-merge")
