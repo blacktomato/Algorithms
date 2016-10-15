@@ -8,10 +8,11 @@ B02901001
 < C++ >
 
 ###使用之編譯器：
-< GNU g++ 5.4.0 20160609 >
+GNU g++ 5.4.0 20160609
 
 ###檔案壓縮方式: 
-< tar -cvf b02901001-p1.tar.gz b02901001-p1/ >
+
+     tar -cvf b02901001-p1.tar.gz b02901001-p1/
 
 ###各檔案說明：    
 *   **b02901001-p1/sort.cpp:** Main source code for dealing with data by different sorting way
