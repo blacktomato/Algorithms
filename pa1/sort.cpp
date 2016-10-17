@@ -2,7 +2,7 @@
  * File Name : sort.cpp
  * Purpose : Sort the word data
  * Creation Date : Fri 23 Sep 2016 11:50:07 AM CST
- * Last Modified : Thu 13 Oct 2016 10:03:30 PM CST
+ * Last Modified : Mon 17 Oct 2016 04:22:40 PM CST
  * Created By : SL Chung
 **************************************************************/
 #include<cstdio>
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
     vector<data> d;
     for(int i = 0; i < Total; i++)
     {
-        pair< string, int > word(p.QueryString(i), i);
+        pair< string, int > word(p.QueryString(i), i+1);
         d.push_back(word);
     }  
     
