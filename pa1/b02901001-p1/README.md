@@ -17,6 +17,7 @@ GNU g++ 5.4.0 20160609
 ###各檔案說明：    
 *   **b02901001-p1/sort.cpp:** Main source code for dealing with data by different sorting way
 *   **b02901001-p1/report.doc:** Report for programming performance and analysis
+*   **b02901001-p1/report.pdf:** Report (PDF version)
 *   **b02901001-p1/README.md:** Documentation for each file
 *   **b02901001-p1/sort:** Executable binary file
 *   **b02901001-p1/Makefile:** Makefile for compiling file easily
