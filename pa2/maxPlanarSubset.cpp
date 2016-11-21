@@ -2,7 +2,7 @@
  * File Name : maxPlanarSubset.cpp
  * Purpose : Count the max planar subset with numbers of vertices on a circle
  * Creation Date : Tue 15 Nov 2016 12:19:28 PM CST
- * Last Modified : Thu 17 Nov 2016 07:50:00 PM CST
+ * Last Modified : Mon 21 Nov 2016 04:54:58 PM CST
  * Created By : SL Chung
 **************************************************************/
 #include<stdio.h>
@@ -17,8 +17,9 @@ using namespace std;
 typedef pair<int, int> line;
 
 int max_finder(int, int, int**, int*, int**);
-int link_tracer(int, int, int**, int*, int**, vector<line>&);
+int link_tracer(int, int, int**, int*, int**, bool*, vector<line>&);
 void checkMTable(int**, int);
+void mergesort(vector<line>&, int, int);
 
 int main(int argc, char** argv)
 {
@@ -42,6 +43,7 @@ int main(int argc, char** argv)
     int line_number = 0;
     infile >> vertice_number;
     int *lineTable = new int[vertice_number];
+    bool *reverseTable = new bool[vertice_number];
     line_number = vertice_number / 2;
     for(int i = 0; i < line_number; i++)
     {
@@ -51,6 +53,8 @@ int main(int argc, char** argv)
         infile >> v2;
         lineTable[v1] = v2;
         lineTable[v2] = v1;
+        reverseTable[v1] = false;
+        reverseTable[v2] = true;
     }
 
 
@@ -79,9 +83,13 @@ int main(int argc, char** argv)
     //checkMTable(maxPTable , vertice_number);
     //cout << endl << "Linking Planar Table:" << endl;
     //checkMTable(linkPTable , vertice_number);
-    
+
     vector<line> lineSet;
-    link_tracer(0, vertice_number - 1, maxPTable, lineTable, linkPTable, lineSet);
+    link_tracer(0, vertice_number - 1, maxPTable, lineTable, linkPTable, reverseTable, lineSet);
+
+    //sorting
+    mergesort(lineSet, 0, maxPTable[0][vertice_number-1]);
+    
     
     //output file
     ofstream outfile;
@@ -111,39 +119,47 @@ int max_finder(int start, int len, int **maxptable, int *line_table, int **linkp
     int end = start + len;
     if (maxptable[start][end] != -1) return maxptable[start][end];
     int result = 0;
-    if(line_table[end] > start && line_table[start] < s)
-    for (int i = 0; i <= len; i++)
+    
+    //default setting (Nothing change)
+    result = maxptable[start][start+len-1];
+    linkptable[start][start+len] = linkptable[start][start+len-1];
+    
+    int crosser = line_table[start+len]; 
+    if (crosser > start + len){}
+    else if (crosser == start)
     {
-        if ( i+1 <= len )
+        if ( len == 1) 
         {
-            if (result < (maxptable[start][start+i] + maxptable[start+i+1][start+len]))
-            {
-                result = (maxptable[start][start+i] + maxptable[start+i+1][start+len]);
-                if (linkptable[start][start+i] != -1)
-                        linkptable[start][start+len] = linkptable[start][start+i];
-                else    linkptable[start][start+len] = linkptable[start+i+1][start+len];
-            }
+            result = 1;
+            linkptable[start][start+len] = start;
         }
         else
         {
-            if (line_table[start] == start+len)
+            if (result < 1 + maxptable[start+1][start+len-1])
             {
-                if ( len >= 2 )
-                {
-                    if (result <= (maxptable[start+1][start + len-1]))
-                    {
-                        result = 1 + maxptable[start+1][start + len - 1];
-                        linkptable[start][start+len] = start;
-                    }
-                }
-                else 
-                {
-                    result = 1;
-                    linkptable[start][start + len] = start;
-                }
+                result = 1 + maxptable[start+1][start+len-1];
+                linkptable[start][start+len] = start;
             }
         }
     }
+    else
+    {
+        //For crosser is possible to be next to the start+len
+        if (start+len-1 < crosser+1)
+        {
+            if (result < 1 + maxptable[start][crosser-1])
+            {
+                result = 1 + maxptable[start][crosser-1];
+                linkptable[start][start+len] = crosser;
+            }
+        }
+        else if (result < 1 + maxptable[start][crosser-1] + maxptable[crosser+1][start+len-1])
+        {
+            result = 1 + maxptable[start][crosser-1] + maxptable[crosser+1][start+len-1];
+            linkptable[start][start+len] = crosser;
+        }
+    } 
+    
     return result;
 }
 
@@ -162,18 +178,72 @@ void checkMTable(int **maxptable , int side)
     }
 }
 
-int link_tracer(int start, int end, int** maxptable, int *line_table, int **linkptable, vector<line> &line_set)
+int link_tracer(int start, int end, int** maxptable, int *line_table,
+                int **linkptable, bool *reversetable, vector<line> &line_set)
 {
     if (linkptable[start][end] == -1) return 1;
     int s = linkptable[start][end];
-    line separater(s, line_table[s]);
+    line separater;
+    if( reversetable[s] == true)
+        separater = line(line_table[s], s);
+    else
+        separater = line(s, line_table[s]);
+    
     line_set.push_back(separater);
     if (s-1 >= start)
-        link_tracer(start, s-1, maxptable, line_table, linkptable, line_set);
+        link_tracer(start, s-1, maxptable, line_table, linkptable, reversetable, line_set);
     if (s+1 < line_table[s]-1)
-        link_tracer(s+1, line_table[s]-1, maxptable, line_table, linkptable, line_set);
+        link_tracer(s+1, line_table[s]-1, maxptable, line_table, linkptable, reversetable, line_set);
     if (line_table[s]+1 <= end)
-        link_tracer(line_table[s]+1, end, maxptable, line_table, linkptable, line_set);
+        link_tracer(line_table[s]+1, end, maxptable, line_table, linkptable, reversetable, line_set);
     return 0;
 }
 
+void mergesort(vector<line> &lines, int start, int end)
+{
+    int s =  end - start;    //start from 0
+    int count = 0;
+    if (s == 1 || s == 0);
+    else if (s >= 2)
+    {
+        int start_1 = start;
+        int end_1 = end - s / 2;
+        int start_2 = end_1;
+        int end_2 = end;
+        mergesort(lines, start_1, end_1);
+        mergesort(lines, start_2, end_2);
+        vector<line> temp;
+        while((end_1 - start_1) * (end_2 - start_2) != 0)
+        {
+            if (lines[start_1] <= lines[start_2])
+            {
+                temp.push_back(lines[start_1]);
+                start_1++;
+            }
+            else
+            {
+                temp.push_back(lines[start_2]);
+                start_2++;
+            }
+            count++;
+        }
+        while(count != s)
+        {
+            if (end_1 - start_1 != 0)
+            {
+                temp.push_back(lines[start_1]);
+                start_1++;
+            }
+            else if (end_2 - start_2 != 0)
+            {
+                temp.push_back(lines[start_2]);
+                start_2++;
+            }
+            count++;
+        }
+        for(int i = start; i < end; i++)
+        {
+            lines[i] = temp[i - start];
+        }
+    }   
+}        
