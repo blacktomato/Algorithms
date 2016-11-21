@@ -2,7 +2,7 @@
  * File Name : maxPlanarSubset.cpp
  * Purpose : Count the max planar subset with numbers of vertices on a circle
  * Creation Date : Tue 15 Nov 2016 12:19:28 PM CST
- * Last Modified : Mon 21 Nov 2016 04:54:58 PM CST
+ * Last Modified : Mon 21 Nov 2016 05:25:34 PM CST
  * Created By : SL Chung
 **************************************************************/
 #include<stdio.h>
@@ -79,10 +79,10 @@ int main(int argc, char** argv)
                 maxPTable[i][i+len] = max_finder(i, len, maxPTable, lineTable, linkPTable);
         }
     }
-    //cout << "Max Planar Table:" << endl;
-    //checkMTable(maxPTable , vertice_number);
-    //cout << endl << "Linking Planar Table:" << endl;
-    //checkMTable(linkPTable , vertice_number);
+//  cout << "Max Planar Table:" << endl;
+//  checkMTable(maxPTable , vertice_number);
+//  cout << endl << "Linking Planar Table:" << endl;
+//  checkMTable(linkPTable , vertice_number);
 
     vector<line> lineSet;
     link_tracer(0, vertice_number - 1, maxPTable, lineTable, linkPTable, reverseTable, lineSet);
@@ -125,7 +125,7 @@ int max_finder(int start, int len, int **maxptable, int *line_table, int **linkp
     linkptable[start][start+len] = linkptable[start][start+len-1];
     
     int crosser = line_table[start+len]; 
-    if (crosser > start + len){}
+    if (crosser > start + len || crosser < start){}
     else if (crosser == start)
     {
         if ( len == 1) 
