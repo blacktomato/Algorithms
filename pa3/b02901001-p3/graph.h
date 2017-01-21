@@ -2,7 +2,7 @@
  * File Name : graph.h
  * Purpose : for mapping global routing to graph
  * Creation Date : Sat 24 Dec 2016 10:32:03 PM CST
- * Last Modified : Fri 06 Jan 2017 12:36:49 PM CST
+ * Last Modified : Sat 21 Jan 2017 01:36:24 PM CST
  * Created By : SL Chung
 **************************************************************/
 #ifndef GRAPH
@@ -39,7 +39,7 @@ class Edge
         //loss function
         float new_weight()
         {
-            return pow(2.0, 10 * (demand/capacity) + 1) - 1;
+            return pow(3.0, (demand/capacity) + 1) - 1;
         }
 };
 

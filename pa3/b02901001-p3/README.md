@@ -16,6 +16,9 @@ g++ (GCC) 6.2.1 20160830
 
 ###各檔案說明：    
 *   **b02901001-p3/router.cpp:** Main source code for global routing problem 
+*   **b02901001-p3/libparser.a:** library for parsing
+*   **b02901001-p3/parse.h:** for parsing
+*   **b02901001-p3/graph.h:** for establishing a graph
 *   **b02901001-p3/router:** Executable binary file
 *   **b02901001-p3/README.md:** Documentation for each file
 *   **b02901001-p3/Makefile:** Makefile for compiling file easily
@@ -27,6 +30,9 @@ Under the directory **b02901001-p3** enter the command:
 
 Makefile would compile the source code with **g++** automatically
 
+Use the following command to delete the binary file and .o files:
+
+    make clean
 ###執行、使用方式說明：
 After compile is done, there will be an executable binary file, named **router**.
 The command format of this binary file:

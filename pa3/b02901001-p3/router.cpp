@@ -2,7 +2,7 @@
  * File Name : router.cpp
  * Purpose : For global routing problem
  * Creation Date : Thu 22 Dec 2016 09:23:51 PM CST
- * Last Modified : Fri 06 Jan 2017 10:02:09 AM CST
+ * Last Modified : Sat 21 Jan 2017 01:40:51 PM CST
  * Created By : SL Chung
 **************************************************************/
 
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < parser.gNumNets(); ++i)
     {
         int idNet = nets[i].first;
-        cout << "Working the " << idNet << " th net..." << endl;
+        //cout << "Working the " << idNet << " th net..." << endl;
         vector< pair<int, float>* > ExtractTable(NumTile, 0);
         pair<int, int> source = parser.gNetStart( idNet );
         pair<int, int> end = parser.gNetEnd( idNet );
@@ -139,8 +139,6 @@ int main(int argc, char **argv)
                     WeightTable[id].second = WeightTable[min.first].second + e.gWeight();
                     TraceTable[id] = min.first;
                 }
-                if (WeightTable[id].second == FLT_MAX)
-                    cout << "fuck";
             }
             swap(ExtractTable[0], ExtractTable[length - 1]);
             length--;
