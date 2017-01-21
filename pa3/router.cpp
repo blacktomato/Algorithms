@@ -2,12 +2,13 @@
  * File Name : router.cpp
  * Purpose : For global routing problem
  * Creation Date : Thu 22 Dec 2016 09:23:51 PM CST
- * Last Modified : Wed 04 Jan 2017 01:28:21 AM CST
+ * Last Modified : Sat 21 Jan 2017 01:40:51 PM CST
  * Created By : SL Chung
 **************************************************************/
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 #include <fstream>
 #include <float.h>
 #include "parser.h"
@@ -17,6 +18,9 @@ using namespace std;
 
 int pair2index(pair<int, int>, int);
 pair<int, int> index2pair(int, int);
+void swap(pair<int, float>*&, pair<int, float>*&);
+void heapify(vector< pair<int, float>* >&, size_t, size_t);
+bool comp_sort(pair<int, float> a, pair<int, float> b){return (a.second < b.second);}
 
 int main(int argc, char **argv)
 {
@@ -26,6 +30,17 @@ int main(int argc, char **argv)
 
     // read the file in the first argument
     if( ! parser.read( argv[1] ) ) { cerr << "Fail to open file: " << argv[1] << endl; return 1; }
+
+    //sort the Net by their length
+    vector<pair<int, float>> nets;
+    for (int idNet = 0; idNet < parser.gNumNets(); idNet++)
+    {
+        pair<int, int> source = parser.gNetStart( idNet );
+        pair<int, int> end = parser.gNetEnd( idNet );
+        float length = sqrt(pow(source.first - end.first, 2) + pow(source.second - end.second, 2));
+        nets.push_back(make_pair(idNet, length));
+    }
+    sort(nets.begin(), nets.end(), comp_sort);
     
     //start the timer
     AlgTimer timer;
@@ -70,7 +85,7 @@ int main(int argc, char **argv)
     cout << "Done" << endl;
 
     //For Dijkstra's algorithm
-    vector<float> WeightTable(NumTile, 0.0);
+    vector<pair<int, float>> WeightTable(NumTile, make_pair(0, 0.0));
     vector<int> TraceTable(NumTile, -1);
     
     //For test
@@ -81,10 +96,11 @@ int main(int argc, char **argv)
 
     cout << "Dijkstra Algorithm..." << endl;
     //Do the Dijkstra Algorithm for NumNets times 
-    for (int idNet = 0; idNet < parser.gNumNets(); ++idNet)
+    for (int i = 0; i < parser.gNumNets(); ++i)
     {
-        cout << "Working the " << idNet << " th net..." << endl;
-        vector<pair<int, float>> ExtractTable(NumTile, make_pair(0, 0.0));
+        int idNet = nets[i].first;
+        //cout << "Working the " << idNet << " th net..." << endl;
+        vector< pair<int, float>* > ExtractTable(NumTile, 0);
         pair<int, int> source = parser.gNetStart( idNet );
         pair<int, int> end = parser.gNetEnd( idNet );
         int index_s = pair2index(source, parser.gNumHTiles());
@@ -93,49 +109,39 @@ int main(int argc, char **argv)
         //initialize the tables for each Dijkstra Algorithm
         for(int i = 0; i < NumTile; i++)
         {
-            ExtractTable[i].first = i;
-            ExtractTable[i].second = FLT_MAX;
-            WeightTable[i] = FLT_MAX;
+            ExtractTable[i] = &WeightTable[i];
+            WeightTable[i].first = i;
+            WeightTable[i].second = FLT_MAX;
             TraceTable[i] = -1;
         }
 
         //Initialize Single Source
-        ExtractTable[index_s].second = 0.0;
-        WeightTable[index_s] = 0.0;
+        WeightTable[index_s].second = 0.0;
         TraceTable[index_s] = index_s;
 
-        //Extract min
+        //Extract min by using heap to fast the operation
         pair<int, float> min(-1, FLT_MAX);
-        int target = -1;
-        while(ExtractTable.size() > 0)
+        size_t length = ExtractTable.size();
+
+        while(length > 0)
         {
-            min = make_pair(-1, FLT_MAX);
-            target = -1; //For extraction
-            //scan ExtractTable to find the minimun
-            for(size_t i = 0; i < ExtractTable.size(); i++)
-            {
-                //Update ExtractTable
-                ExtractTable[i].second = WeightTable[ExtractTable[i].first];
-                if(min.second > ExtractTable[i].second)
-                {
-                    min = ExtractTable[i];
-                    target = i;
-                }
-            }
-            //assure the target must be in the Graph
-            ExtractTable.erase(ExtractTable.begin() + target);
+            for (int i = length / 2 - 1; i >= 0; i--)
+                heapify(ExtractTable, i, length);
+            min = WeightTable[ExtractTable[0]->first];
             Vertex u = RoutingTiles.gVertex(min.first);
             //update the weight of adjacent vertices
             for (size_t i = 0; i < u.gNumL(); i++)
             {
                 Edge e = u.glink(i);
                 int id = e.gPVertex()->gId();
-                if (WeightTable[id] > WeightTable[min.first] + e.gWeight())
+                if (WeightTable[id].second > WeightTable[min.first].second + e.gWeight())
                 {
-                    WeightTable[id] = WeightTable[min.first] + e.gWeight();
+                    WeightTable[id].second = WeightTable[min.first].second + e.gWeight();
                     TraceTable[id] = min.first;
                 }
             }
+            swap(ExtractTable[0], ExtractTable[length - 1]);
+            length--;
         }
 
         //Trace back for the end vertex
@@ -161,7 +167,7 @@ int main(int argc, char **argv)
     
     for(size_t i = 0; i < resultTable.size(); i++)
     {
-        outfile << i << " " << resultTable[i].size() - 1 << endl;
+        outfile << nets[i].first << " " << resultTable[i].size() - 1 << endl;
         for(size_t j = 0; j < resultTable[i].size() - 1; j++)
         {
             outfile << resultTable[i][j].first << " " <<  resultTable[i][j].second << " ";
@@ -186,3 +192,28 @@ pair<int, int> index2pair(int i, int NumH)
     pair<int, int> p(i / NumH,  i % NumH);
     return p;
 }
+
+void swap(pair<int, float>* &a, pair<int, float>* &b)
+{ 
+    pair<int, float> *temp = a;
+    a = b;
+    b = temp;
+} 
+
+void heapify(vector< pair<int, float>* > &datas, size_t root, size_t length)
+{
+    size_t leftNode = root * 2 + 1;
+    size_t rightNode = root * 2 + 2;
+    //default setting the minNode is root
+    size_t minNode = root;
+    if (leftNode < length && datas[leftNode]->second < datas[minNode]->second)
+        minNode = leftNode;
+    if (rightNode < length && datas[rightNode]->second < datas[minNode]->second)
+        minNode = rightNode;
+    if (minNode != root)
+    {
+        swap(datas[minNode], datas[root]);
+        heapify(datas, minNode, length);
+    }
+}
+
